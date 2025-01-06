@@ -3,6 +3,7 @@ from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.MenuList import MenuList
+from Components.Pixmap import Pixmap
 from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import MessageBox
 import os
@@ -12,7 +13,7 @@ import zipfile
 
 PLUGIN_NAME = "CiefpSettingsDownloader"
 PLUGIN_DESC = "Download and install Ciefp settings from GitHub"
-PLUGIN_VERSION = "1.1"  # Verzija plugina
+PLUGIN_VERSION = "1.2"  # Verzija plugina
 PLUGIN_ICON = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/icon.png"
 
 GITHUB_API_URL = "https://api.github.com/repos/ciefp/ciefpsettings-enigma2-zipped/contents/"
@@ -28,19 +29,25 @@ STATIC_NAMES = [
     "ciefp-E2-18sat-42E-39E-36E-33E-28E-26E-23E-19E-16E-13E-10E-9E-7E-4.8E-1.9E-0.8w-4W-5w",
     "ciefp-E2-75E-34W"
 ]
-
 class CiefpSettingsDownloaderScreen(Screen):
     def __init__(self, session):
         self.skin = """
-        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="900,540" title="Ciefp Settings Downloader (v{version})">
-            <widget name="menu" position="10,10" size="880,440" scrollbarMode="showOnDemand" />
-            <widget name="status" position="10,460" size="880,60" font="Regular;24" halign="center" valign="center" />
+        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1200,600" title="Ciefp Settings Downloader (v{version})">
+            <!-- Menu occupies 75% of the screen width -->
+            <widget name="menu" position="10,10" size="900,480" scrollbarMode="showOnDemand" />
+    
+            <!-- Status bar at the bottom -->
+            <widget name="status" position="10,500" size="900,90" font="Regular;24" halign="center" valign="center" />
+    
+            <!-- Background image (25% of the width) on the right side -->
+            <widget name="background" position="920,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background.png" />
         </screen>
         """.format(version=PLUGIN_VERSION)
         Screen.__init__(self, session)
         self.session = session
 
         self["menu"] = MenuList([])  # Prazan meni
+        self["background"] = Pixmap()
         self["status"] = Label("Fetching available channel lists...")
         self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"], {
             "ok": self.ok_pressed,
