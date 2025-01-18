@@ -1,3 +1,9 @@
+from __future__ import print_function
+import sys
+import os
+import requests
+import shutil
+import zipfile
 from enigma import eDVBDB  # Import za eDVBDB
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
@@ -6,14 +12,10 @@ from Components.MenuList import MenuList
 from Components.Pixmap import Pixmap
 from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import MessageBox
-import os
-import requests
-import shutil
-import zipfile
 
 PLUGIN_NAME = "CiefpSettingsDownloader"
 PLUGIN_DESC = "Download and install Ciefp settings from GitHub"
-PLUGIN_VERSION = "1.2"  # Verzija plugina
+PLUGIN_VERSION = "1.3"
 PLUGIN_ICON = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/icon.png"
 
 GITHUB_API_URL = "https://api.github.com/repos/ciefp/ciefpsettings-enigma2-zipped/contents/"
@@ -29,24 +31,31 @@ STATIC_NAMES = [
     "ciefp-E2-18sat-42E-39E-36E-33E-28E-26E-23E-19E-16E-13E-10E-9E-7E-4.8E-1.9E-0.8w-4W-5w",
     "ciefp-E2-75E-34W"
 ]
+
+# Kompatibilnost za Python 2 i Python 3
+try:
+    from StringIO import StringIO  # Python 2
+except ImportError:
+    from io import StringIO  # Python 3
+
+def to_unicode(s):
+    if sys.version_info[0] < 3:
+        return s.decode('utf-8') if isinstance(s, str) else s
+    return s
+
 class CiefpSettingsDownloaderScreen(Screen):
     def __init__(self, session):
         self.skin = """
         <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1200,600" title="Ciefp Settings Downloader (v{version})">
-            <!-- Menu occupies 75% of the screen width -->
             <widget name="menu" position="10,10" size="900,480" scrollbarMode="showOnDemand" />
-    
-            <!-- Status bar at the bottom -->
             <widget name="status" position="10,500" size="900,90" font="Regular;24" halign="center" valign="center" />
-    
-            <!-- Background image (25% of the width) on the right side -->
             <widget name="background" position="920,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background.png" />
         </screen>
         """.format(version=PLUGIN_VERSION)
-        Screen.__init__(self, session)
+        super(CiefpSettingsDownloaderScreen, self).__init__(session)
         self.session = session
 
-        self["menu"] = MenuList([])  # Prazan meni
+        self["menu"] = MenuList([])
         self["background"] = Pixmap()
         self["status"] = Label("Fetching available channel lists...")
         self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"], {
@@ -56,11 +65,10 @@ class CiefpSettingsDownloaderScreen(Screen):
             "down": self.move_down
         }, -1)
 
-        self.available_files = {}  # Skladišti pronađene fajlove
+        self.available_files = {}
         self.fetch_file_list()
 
     def fetch_file_list(self):
-        """Prikupljanje liste fajlova sa GitHub API-ja."""
         try:
             self["status"].setText("Fetching available lists from GitHub...")
             response = requests.get(GITHUB_API_URL, timeout=10)
@@ -80,12 +88,11 @@ class CiefpSettingsDownloaderScreen(Screen):
             else:
                 self["status"].setText("No valid lists found on GitHub.")
         except requests.exceptions.RequestException as e:
-            self["status"].setText(f"Network error: {str(e)}")
+            self["status"].setText("Network error: " + to_unicode(str(e)))
         except Exception as e:
-            self["status"].setText(f"Error processing lists: {str(e)}")
+            self["status"].setText("Error processing lists: " + to_unicode(str(e)))
 
     def ok_pressed(self):
-        """Metoda pozvana kada se pritisne dugme 'OK'."""
         selected_item = self["menu"].getCurrent()
         if selected_item:
             self.download_and_install(selected_item)
@@ -97,35 +104,34 @@ class CiefpSettingsDownloaderScreen(Screen):
         self["menu"].down()
 
     def download_and_install(self, selected_item):
-        """Preuzimanje i instalacija odabrane liste."""
         file_name = self.available_files.get(selected_item)
         if not file_name:
-            self["status"].setText(f"Error: No file found for {selected_item}.")
+            self["status"].setText("Error: No file found for {0}.".format(selected_item))
             return
 
-        url = f"https://github.com/ciefp/ciefpsettings-enigma2-zipped/raw/refs/heads/master/{file_name}"
-        download_path = f"/tmp/{file_name}"
-        extract_path = f"/tmp/{selected_item}"
+        url = "https://github.com/ciefp/ciefpsettings-enigma2-zipped/raw/refs/heads/master/" + file_name
+        download_path = "/tmp/" + file_name
+        extract_path = "/tmp/" + selected_item
 
         try:
-            self["status"].setText(f"Downloading {file_name}...")
+            self["status"].setText("Downloading {0}...".format(file_name))
             response = requests.get(url, stream=True, timeout=15)
             response.raise_for_status()
             with open(download_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)
 
-            self["status"].setText(f"Extracting {file_name}...")
+            self["status"].setText("Extracting {0}...".format(file_name))
             with zipfile.ZipFile(download_path, "r") as zip_ref:
                 zip_ref.extractall(extract_path)
 
             self.copy_files(extract_path)
             self.reload_settings()
-            self["status"].setText(f"{selected_item} installed successfully!")
+            self["status"].setText("{0} installed successfully!".format(selected_item))
         except requests.exceptions.RequestException as e:
-            self["status"].setText(f"Download error: {str(e)}")
+            self["status"].setText("Download error: " + to_unicode(str(e)))
         except Exception as e:
-            self["status"].setText(f"Installation error: {str(e)}")
+            self["status"].setText("Installation error: " + to_unicode(str(e)))
         finally:
             if os.path.exists(download_path):
                 os.remove(download_path)
@@ -133,7 +139,6 @@ class CiefpSettingsDownloaderScreen(Screen):
                 shutil.rmtree(extract_path)
 
     def copy_files(self, path):
-        """Kopiranje fajlova na odgovarajuće direktorijume."""
         dest_enigma2 = "/etc/enigma2/"
         dest_tuxbox = "/etc/tuxbox/"
 
@@ -145,18 +150,17 @@ class CiefpSettingsDownloaderScreen(Screen):
                     shutil.move(os.path.join(root, file), os.path.join(dest_enigma2, file))
 
     def reload_settings(self):
-        """Ponovno učitavanje podešavanja Enigma2."""
         try:
             eDVBDB.getInstance().reloadServicelist()
             eDVBDB.getInstance().reloadBouquets()
             self.session.open(MessageBox, "Reload successful! New settings are now active.  .::ciefpsettings::.", MessageBox.TYPE_INFO, timeout=5)
         except Exception as e:
-            self.session.open(MessageBox, f"Reload failed: {str(e)}", MessageBox.TYPE_ERROR, timeout=5)
+            self.session.open(MessageBox, "Reload failed: " + to_unicode(str(e)), MessageBox.TYPE_ERROR, timeout=5)
 
 def Plugins(**kwargs):
     return [
         PluginDescriptor(
-            name=f"{PLUGIN_NAME} v{PLUGIN_VERSION}",  # Dodata verzija u ime plugina
+            name="{0} v{1}".format(PLUGIN_NAME, PLUGIN_VERSION),
             description=PLUGIN_DESC,
             where=PluginDescriptor.WHERE_PLUGINMENU,
             icon=PLUGIN_ICON,
