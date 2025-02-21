@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 import os
+import re
 import requests
 import shutil
 import zipfile
@@ -15,7 +16,7 @@ from Screens.MessageBox import MessageBox
 
 PLUGIN_NAME = "CiefpSettingsDownloader"
 PLUGIN_DESC = "Download and install Ciefp settings from GitHub"
-PLUGIN_VERSION = "1.3"
+PLUGIN_VERSION = "1.4"
 PLUGIN_ICON = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/icon.png"
 
 GITHUB_API_URL = "https://api.github.com/repos/ciefp/ciefpsettings-enigma2-zipped/contents/"
@@ -46,10 +47,11 @@ def to_unicode(s):
 class CiefpSettingsDownloaderScreen(Screen):
     def __init__(self, session):
         self.skin = """
-        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1200,600" title="Ciefp Settings Downloader (v{version})">
-            <widget name="menu" position="10,10" size="900,480" scrollbarMode="showOnDemand" />
-            <widget name="status" position="10,500" size="900,90" font="Regular;24" halign="center" valign="center" />
-            <widget name="background" position="920,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background.png" />
+        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1500,600" title="Ciefp Settings Downloader (v{version})">
+            <widget name="background2" position="10,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background2.png" />
+            <widget name="menu" position="320,10" size="880,480" scrollbarMode="showOnDemand" />
+            <widget name="status" position="320,500" size="880,90" font="Regular;24" halign="center" valign="center" />
+            <widget name="background" position="1200,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background.png" />
         </screen>
         """.format(version=PLUGIN_VERSION)
         super(CiefpSettingsDownloaderScreen, self).__init__(session)
@@ -57,7 +59,9 @@ class CiefpSettingsDownloaderScreen(Screen):
 
         self["menu"] = MenuList([])
         self["background"] = Pixmap()
+        self["background2"] = Pixmap()
         self["status"] = Label("Fetching available channel lists...")
+        self["version_info"] = Label("")  # New label for version info
         self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"], {
             "ok": self.ok_pressed,
             "cancel": self.close,
