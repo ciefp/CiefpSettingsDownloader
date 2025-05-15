@@ -16,7 +16,7 @@ from Screens.MessageBox import MessageBox
 
 PLUGIN_NAME = "CiefpSettingsDownloader"
 PLUGIN_DESC = "Download and install Ciefp settings from GitHub"
-PLUGIN_VERSION = "1.4"
+PLUGIN_VERSION = "1.5"
 PLUGIN_ICON = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/icon.png"
 
 GITHUB_API_URL = "https://api.github.com/repos/ciefp/ciefpsettings-enigma2-zipped/contents/"
@@ -47,11 +47,11 @@ def to_unicode(s):
 class CiefpSettingsDownloaderScreen(Screen):
     def __init__(self, session):
         self.skin = """
-        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1500,600" title="Ciefp Settings Downloader (v{version})">
-            <widget name="background2" position="10,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background2.png" />
-            <widget name="menu" position="320,10" size="880,480" scrollbarMode="showOnDemand" />
-            <widget name="status" position="320,500" size="880,90" font="Regular;24" halign="center" valign="center" />
-            <widget name="background" position="1200,10" size="300,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background.png" />
+        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1800,800" title="..:: Ciefp Settings Downloader ::.. ..:: (v{version}) ::..">
+            <widget name="background2" position="10,10" size="350,800" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background2.png" />
+            <widget name="menu" position="370,10" size="1100,680" scrollbarMode="showOnDemand" itemHeight="30" font="Regular;26" />
+            <widget name="status" position="370,700" size="1100,50" font="Regular;24" halign="center" valign="center" transparent="1" />
+            <widget name="background" position="1450,10" size="350,800" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/background.png" />
         </screen>
         """.format(version=PLUGIN_VERSION)
         super(CiefpSettingsDownloaderScreen, self).__init__(session)
