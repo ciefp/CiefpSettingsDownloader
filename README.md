@@ -3,7 +3,7 @@
 # CiefpSettingsDownloader
 
 
-![Bouquet](https://github.com/ciefp/CiefpSettingsDownloader/blob/main/ciefpsettingsdownloader.jpg) 
+![Bouquet](https://github.com/ciefp/CiefpSettingsDownloader/blob/main/ciefpsettingsdownloader-2.jpg) 
  
 ## Description:
 CiefpSettingsDownloader provides Enigma2 receiver users with a fast and easy way to 
