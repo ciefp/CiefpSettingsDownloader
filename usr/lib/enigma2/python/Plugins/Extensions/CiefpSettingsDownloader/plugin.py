@@ -16,7 +16,7 @@ from Screens.MessageBox import MessageBox
 
 PLUGIN_NAME = "CiefpSettingsDownloader"
 PLUGIN_DESC = "Download and install Ciefp settings from GitHub"
-PLUGIN_VERSION = "1.6"
+PLUGIN_VERSION = "1.7"
 PLUGIN_ICON = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/icon.png"
 
 GITHUB_API_URL = "https://api.github.com/repos/ciefp/ciefpsettings-enigma2-zipped/contents/"
@@ -55,17 +55,19 @@ class CiefpSettingsDownloaderScreen(Screen):
     """Full HD Module for downloading settings integrated into CiefpE2editor"""
 
     skin = """
-        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1920,1080" backgroundColor="#011a2e">
+        <screen name="CiefpSettingsDownloaderScreen" position="center,center" size="1920,1080"  backgroundColor="#011a2e">
             <!-- Background Image Component -->
-            <widget name="background" position="1300,90" size="600,800" zPosition="0" transparent="1" />
-
-            <widget name="plugin_title" position="0,10" size="1920,45" font="Bold;32" halign="center" backgroundColor="#012e01" foregroundColor="#FFFFFF" zPosition="1" />
-            <widget name="menu" position="60,90" size="1200,800" scrollbarMode="showOnDemand" itemHeight="40" font="Regular;28" backgroundColor="#011a2e" zPosition="1" />
+            <widget name="separator0" position="0,10" size="1920,3" backgroundColor="#d5fa02" zPosition="1" /> 
+            <widget name="background" position="1300,100" size="600,800" zPosition="0" />
+            <widget name="plugin_title" position="0,20" size="1920,60" font="Bold;32" halign="center" backgroundColor="#012e01" foregroundColor="#FFFFFF" zPosition="1" />
+            <widget name="separator1" position="0,80" size="1920,3" backgroundColor="#d5fa02" zPosition="1" />
+            <widget name="menu" position="60,100" size="1200,800" scrollbarMode="showOnDemand" itemHeight="40" font="Regular;28" backgroundColor="#011a2e" zPosition="1" />
             <widget name="status" position="60,920" size="1800,50" font="Regular;26" halign="center" valign="center" foregroundColor="#00FF00" backgroundColor="#011a2e" transparent="1" zPosition="1" />
-
+            <widget name="separator2" position="0,910" size="1920,3" backgroundColor="#d5fa02" zPosition="1" />
             <!-- Bottom Buttons -->
-            <widget name="red_button" position="60,1000" size="250,40" font="Bold;28" halign="center" backgroundColor="#9F1313" foregroundColor="#FFFFFF" text="Back" zPosition="1" />
-            <widget name="green_button" position="330,1000" size="250,40" font="Bold;28" halign="center" backgroundColor="#1F771F" foregroundColor="#FFFFFF" text="Download &amp; Install" zPosition="1" />
+            <widget name="separator3" position="0,990" size="1920,3" backgroundColor="#d5fa02" zPosition="1" />
+            <widget name="red_button" position="20,1000" size="920,40" font="Bold;28" halign="center" backgroundColor="#9F1313" foregroundColor="#FFFFFF" text="Back" zPosition="1" />
+            <widget name="green_button" position="1000,1000" size="900,40" font="Bold;28" halign="center" backgroundColor="#1F771F" foregroundColor="#FFFFFF" text="Download &amp; Install" zPosition="1" />
         </screen>
     """
 
@@ -73,7 +75,7 @@ class CiefpSettingsDownloaderScreen(Screen):
         super(CiefpSettingsDownloaderScreen, self).__init__(session)
         self.session = session
 
-        self["plugin_title"] = Label("..:: Ciefp Settings Downloader ::.. (v1.5)")
+        self["plugin_title"] = Label("..:: Ciefp Settings Downloader ::.. (v1.7)")
         self["menu"] = MenuList([])
         self["status"] = Label("Connecting to GitHub...")
         self["red_button"] = Label("Back")
@@ -81,6 +83,12 @@ class CiefpSettingsDownloaderScreen(Screen):
 
         # Ispravna inicijalizacija Pixmap-a
         self["background"] = Pixmap()
+
+        # Separatori
+        self["separator0"] = Label()
+        self["separator1"] = Label()
+        self["separator2"] = Label()
+        self["separator3"] = Label()
 
         self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ColorActions"], {
             "ok": self.ok_pressed,
