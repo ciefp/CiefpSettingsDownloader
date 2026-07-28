@@ -104,7 +104,7 @@ class CiefpSettingsDownloaderScreen(Screen):
 
     def init_screen_data(self):
         # Ispravan način za postavljanje slike
-        img_path = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/downloader.png"
+        img_path = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/settingsdownloader.png"
 
         # Provjeri postoji li slika
         if os.path.exists(img_path):
