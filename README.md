@@ -53,12 +53,12 @@ If you are not sure which image version you are running:
 ═══════════════════════════════════════════════════════════
 
 # Other changes in v1.9:
-  • Plugin version bumped to 1.9
-  • Redesigned bottom bar — 3 equal-width buttons on main
+  - Plugin version bumped to 1.9
+  - Redesigned bottom bar — 3 equal-width buttons on main
     screen (Back / Download & Install / DAB+ Radio))
-  • Added new "settingsdownloader.png" logo for the Settings screen
-  • Added new "dabradio.png" logo for the DAB+ screen
-  • Improved stability and error handling
+  - Added new "settingsdownloader.png" logo for the Settings screen
+  - Added new "dabradio.png" logo for the DAB+ screen
+  - Improved stability and error handling
 
 # .:: Ciefp Settings ::.
  
