@@ -15,15 +15,15 @@ for downloading and installing DAB+ radio bouquets directly from
 GitHub (ciefp/CiefpVibesFiles → DAB_RADIO).
 
 # The new screen offers:
-  • Multi-select of bouquets (OK / Yellow = mark/unmark)
-  • "Install Selected" (Green) — installs only marked bouquets
-  • "Mark / Unmark" (Yellow) — quick toggle for current row
-  • "Select All / Install All" (Blue) — mark all or install all
-  • Pretty display names instead of raw filenames
+  - Multi-select of bouquets (OK / Yellow = mark/unmark)
+  - "Install Selected" (Green) — installs only marked bouquets
+  - "Mark / Unmark" (Yellow) — quick toggle for current row
+  - "Select All / Install All" (Blue) — mark all or install all
+  - Pretty display names instead of raw filenames
     (e.g. "Dab Bundesmux2 23.5E" instead of "userbouquet.dab_bundesmux2_235e.radio")
-  • Automatic bouquet registration in /etc/enigma2/bouquets.radio
+  - Automatic bouquet registration in /etc/enigma2/bouquets.radio
     (#SERVICE 1:7:2:0:0:0:0:0:0:0:FROM BOUQUET "..." ORDER BY bouquet)
-  • Automatic settings reload after installation
+  - Automatic settings reload after installation
 
 ═══════════════════════════════════════════════════════════
 ⚠️  IMPORTANT WARNING — READ BEFORE INSTALLING DAB+ BOUQUETS
