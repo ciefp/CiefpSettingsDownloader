@@ -5,6 +5,7 @@ import re
 import requests
 import shutil
 import zipfile
+from datetime import datetime
 from enigma import eDVBDB
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
@@ -16,7 +17,7 @@ from Screens.MessageBox import MessageBox
 
 PLUGIN_NAME = "CiefpSettingsDownloader"
 PLUGIN_DESC = "Download and install Ciefp settings from GitHub"
-PLUGIN_VERSION = "1.9"
+PLUGIN_VERSION = "2.0"
 PLUGIN_ICON = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/icon.png"
 PLUGIN_DIR = "/usr/lib/enigma2/python/Plugins/Extensions/CiefpSettingsDownloader/"
 
@@ -105,8 +106,9 @@ class CiefpSettingsDownloaderScreen(Screen):
             <widget name="plugin_title" position="0,20" size="1920,60" font="Bold;32" halign="center" backgroundColor="#012e01" foregroundColor="#FFFFFF" zPosition="1" />
             <widget name="separator1" position="0,80" size="1920,3" backgroundColor="#d5fa02" zPosition="1" />
             <widget name="menu" position="60,100" size="1200,800" scrollbarMode="showOnDemand" itemHeight="40" font="Regular;28" backgroundColor="#011a2e" zPosition="1" />
-            <widget name="status" position="60,920" size="1800,50" font="Regular;26" halign="center" valign="center" foregroundColor="#00FF00" backgroundColor="#011a2e" transparent="1" zPosition="1" />
+            <widget name="status" position="650,920" size="1200,50" font="Regular;26" halign="left" valign="center" foregroundColor="#00FF00" backgroundColor="#011a2e" transparent="1" zPosition="1" />
             <widget name="separator2" position="0,910" size="1920,3" backgroundColor="#d5fa02" zPosition="1" />
+            <widget name="version_info" position="60,920" size="500,50" font="Regular;28" halign="center" valign="center" foregroundColor="#00FFFF" backgroundColor="#011a2e" transparent="1" zPosition="1" />
             <widget name="separator3" position="0,990" size="1920,3" backgroundColor="#d5fa02" zPosition="1" />
             <widget name="red_button" position="20,1000" size="620,40" font="Bold;28" halign="center" backgroundColor="#9F1313" foregroundColor="#FFFFFF" text="Back" zPosition="1" />
             <widget name="green_button" position="650,1000" size="620,40" font="Bold;28" halign="center" backgroundColor="#1F771F" foregroundColor="#FFFFFF" text="Download &amp; Install" zPosition="1" />
@@ -118,13 +120,14 @@ class CiefpSettingsDownloaderScreen(Screen):
         super(CiefpSettingsDownloaderScreen, self).__init__(session)
         self.session = session
 
-        self["plugin_title"] = Label("..:: Ciefp Settings Downloader ::.. (v1.9)")
+        self["plugin_title"] = Label("..:: Ciefp Settings Downloader ::.. (v2.0)")
         self["menu"] = MenuList([])
         self["status"] = Label("Connecting to GitHub...")
         self["red_button"] = Label("Back")
         self["green_button"] = Label("Download & Install")
         self["blue_button"] = Label("DAB+ Radio")
         self["background"] = Pixmap()
+        self["version_info"] = Label("")
         self["separator0"] = Label()
         self["separator1"] = Label()
         self["separator2"] = Label()
@@ -154,6 +157,41 @@ class CiefpSettingsDownloaderScreen(Screen):
     def open_dab_screen(self):
         self.session.open(CiefpDabRadioScreen)
 
+    def show_version_info(self):
+        """
+        Iz imena fajla tipa 'ciefp-E2-75E-34W-05.09.2026.zip'
+        izvuče datum i prikaže najnoviju verziju (samo datum).
+        """
+
+        def parse_date(name):
+            m = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', name)
+            if m:
+                try:
+                    return datetime.strptime(
+                        "{}.{}.{}".format(m.group(1), m.group(2), m.group(3)),
+                        "%d.%m.%Y"
+                    )
+                except ValueError:
+                    return None
+            return None
+
+        versions_with_dates = []
+        for static_name, file_name in self.available_files.items():
+            d = parse_date(file_name)
+            if d:
+                versions_with_dates.append((d, file_name))
+
+        if versions_with_dates:
+            versions_with_dates.sort(key=lambda x: x[0], reverse=True)
+            latest_date = versions_with_dates[0][0]
+            self["version_info"].setText(
+                "Latest version: {}".format(latest_date.strftime("%d.%m.%Y"))
+            )
+        else:
+            self["version_info"].setText(
+                "Found {} channel list(s)".format(len(self.available_files))
+            )
+
     def fetch_file_list(self):
         try:
             self["status"].setText("Fetching available channel lists from GitHub...")
@@ -169,10 +207,14 @@ class CiefpSettingsDownloaderScreen(Screen):
             if sorted_files:
                 self["menu"].setList(sorted_files)
                 self["status"].setText("Select a channel list and press OK or Green button to install.")
+                # --- PRIKAZ DATUMA VERZIJE ---
+                self.show_version_info()
             else:
                 self["status"].setText("No valid lists found on GitHub repository.")
+                self["version_info"].setText("No available version found")
         except Exception as e:
             self["status"].setText("Error: " + to_unicode(str(e)))
+            self["version_info"].setText("Error fetching version information")
 
     def ok_pressed(self):
         selected_item = self["menu"].getCurrent()
